@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>snowflake</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/0.7.3/p5.js"></script>
+
+</head>
+
+<body>
+
+    <script>
+        const w = 600;
+        const h = 600;
+        const static_flakes = [];
+        let moving_flake = null;
+
+        function setup() {
+            createCanvas(600, 600);
+            background(200);
+            moving_flake = new Snowflake();
+        }
+
+        class Snowflake {
+            constructor() {
+                this.x = w / 2;
+                this.y = 0;
+                this.r = 3;
+            }
+
+            show() {
+                fill('white');
+                stroke('0');
+                circle(this.x, this.y, this.r);
+            }
+
+            move() {
+                const speed = 1;
+                this.x -= 1 * speed;
+                this.y += (1 - random(2)) * speed;
+            }
+
+            touching(snowflake) {
+                return (dist(snowflake.x, snowflake.y, this.x, this.y) < (snowflake.r + this.r));
+            }
+        }
+
+        function draw() {
+            background(200);
+
+            push();
+            translate(w / 2, h / 2);
+
+            for (let i = 0; i < 5; i++) {
+                moving_flake.move();
+                moving_flake.show();
+
+                for (let i = 1; i < 6; i++) {
+                    push();
+                    rotate(i * PI / 3);
+                    moving_flake.show();
+                    pop();
+                }
+
+                let hasTouched = false;
+
+                for (let i = 0; i < static_flakes.length; i++) {
+                    if (static_flakes[i].touching(moving_flake)) {
+                        hasTouched = true;
+                        break;
+                    }
+                }
+
+                if (moving_flake.x <= 0 || hasTouched) {
+                    static_flakes.push(moving_flake);
+                    moving_flake = new Snowflake();
+                }
+
+                static_flakes.forEach(sf => {
+                    sf.show();
+                    for (let i = 1; i < 6; i++) {
+                        push();
+                        rotate(i * PI / 3);
+                        sf.show();
+                        pop();
+                    }
+                });
+            }
+
+            pop();
+
+        }
+    </script>
+</body>
+
+</html>
